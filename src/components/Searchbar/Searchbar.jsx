@@ -1,35 +1,42 @@
-import React, { Component } from 'react';
-import Notiflix from 'notiflix';
-import css from './Searchbar.module.css';
+import PropTypes from 'prop-types';
+import { Formik, Field } from 'formik';
+import {
+  Header,
+  SearchForm,
+  ButtonForm,
+  ButtonLabel,
+  Input,
+} from './SearchbarStyled';
 
-export class Searchbar extends Component {
-  handleSubmit = evt => {
-    evt.preventDefault();
-    const query = evt.target.elements.searchInput.value.toLowerCase().trim();
-    if (query) {
-      this.props.onSubmit(query);
-    } else {
-      Notiflix.Notify.info('Please, enter your request');
-    }
-  };
-  render() {
-    return (
-      <header className={css.searchbar}>
-        <form className={css.searchForm} onSubmit={this.handleSubmit}>
-          <button type="submit" className={css.searchFormButton}>
-            <span className={css.searchFormButtonLabel}>Search</span>
-          </button>
-
-          <input
-            className={css.searchFormInput}
-            name="searchInput"
-            type="text"
-            autoComplete="off"
+const Searchbar = ({ onFormSubmit }) => {
+  return (
+    <Header>
+      <Formik
+        initialValues={{ value: '' }}
+        onSubmit={(values, { resetForm }) => {
+          onFormSubmit(values.value.trim());
+          resetForm();
+        }}
+      >
+        <SearchForm>
+          <ButtonForm type="submit">
+            <ButtonLabel>Search</ButtonLabel>
+          </ButtonForm>
+          <Field
+            as={Input}
+            name="value"
+            autocomplete="off"
             autoFocus
             placeholder="Search images and photos"
           />
-        </form>
-      </header>
-    );
-  }
-}
+        </SearchForm>
+      </Formik>
+    </Header>
+  );
+};
+
+Searchbar.propTypes = {
+  onFormSubmit: PropTypes.func.isRequired,
+};
+
+export default Searchbar;

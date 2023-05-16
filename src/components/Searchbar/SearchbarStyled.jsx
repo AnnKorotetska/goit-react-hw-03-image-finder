@@ -1,4 +1,7 @@
-.searchbar {
+import styled from 'styled-components';
+import { Form } from 'formik';
+
+export const Header = styled.header`
   top: 0;
   left: 0;
   position: sticky;
@@ -15,24 +18,24 @@
   background-color: #3f51b5;
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
     0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
-}
+`;
 
-.searchForm {
+export const SearchForm = styled(Form)`
   display: flex;
   align-items: center;
   width: 100%;
   max-width: 600px;
   background-color: #fff;
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
-}
+`;
 
-.searchFormButton {
+export const ButtonForm = styled.button`
   display: inline-block;
   width: 48px;
   height: 48px;
   border: 0;
-  background-image: url('https://www.svgrepo.com/show/75518/magnifying-glass.svg');
+  background-image: url('https://www.freepnglogos.com/uploads/search-png/search-icon-clip-art-clkerm-vector-clip-art-online-22.png');
   background-size: 40%;
   background-repeat: no-repeat;
   background-position: center;
@@ -40,13 +43,12 @@
   transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   outline: none;
-}
+  :hover {
+    opacity: 1;
+  }
+`;
 
-.searchFormButton:hover {
-  opacity: 1;
-}
-
-.searchFormButtonLabel {
+export const ButtonLabel = styled.span`
   position: absolute;
   width: 1px;
   height: 1px;
@@ -56,9 +58,9 @@
   white-space: nowrap;
   clip-path: inset(50%);
   border: 0;
-}
+`;
 
-.searchFormInput {
+export const Input = styled.input`
   display: inline-block;
   width: 100%;
   font: inherit;
@@ -67,9 +69,8 @@
   outline: none;
   padding-left: 4px;
   padding-right: 4px;
-}
-
-.searchForm-input::placeholder {
-  font: inherit;
-  font-size: 18px;
-}
+  ::placeholder {
+    font: inherit;
+    font-size: 18px;
+  }
+`;

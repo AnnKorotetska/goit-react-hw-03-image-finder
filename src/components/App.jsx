@@ -1,83 +1,71 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import Notiflix from 'notiflix';
-import * as Scroll from 'react-scroll';
-import { Searchbar } from './Searchbar/Searchbar';
+import Api from './API/Api';
+import Searchbar from './Searchbar/Searchbar';
+import ImageGallery from './ImageGallery/ImageGallery';
+import Modal from './Modal/Modal';
 import { Loader } from './Loader/Loader';
-import { ImageGallery } from './ImageGallery/ImageGallery';
-import { Button } from './Button/Button';
-
-const API_KEY = '34809921-a63c416ab49de415c2d2110de';
-const BASE_URL = 'https://pixabay.com/api/?';
-const searchParams = 'image_type=photo&orientation=horizontal&per_page=12';
-const scroll = Scroll.animateScroll;
+import Button from './Button/Button';
+import { AppWrapper } from './AppStyled';
 
 export class App extends Component {
   state = {
-    searchQuery: '',
     images: [],
+    value: '',
     page: 1,
     isLoading: false,
+    isModalOpen: false,
+    modalData: null,
   };
 
-  handleSubmit = async query => {
-    if (query === this.state.searchQuery) {
-      return;
-    }
-    const searchUrl = `${BASE_URL}q=${query}&page=1&key=${API_KEY}&${searchParams}`;
-    try {
+  componentDidUpdate(_, prevState) {
+    const { value, page, images } = this.state;
+
+    if (page !== prevState.page || value !== prevState.value) {
       this.setState({ isLoading: true });
-      scroll.scrollToTop();
-      const response = await axios.get(searchUrl);
-      if (response.data.hits.length === 0) {
-        Notiflix.Notify.info('Images not found. Please change your request');
-        return;
-      }
-      this.setState({
-        searchQuery: query,
-        images: response.data.hits,
-        page: 1,
-      });
-    } catch (error) {
-      Notiflix.Notify.failure('Something went wrong, try again.');
-    } finally {
-      this.setState({ isLoading: false });
+      Api(value, page)
+        .then(({ data }) =>
+          this.setState({ images: [...images, ...data.hits] })
+        )
+        .catch(err => alert(err.message))
+        .finally(() => this.setState({ isLoading: false }));
     }
+  }
+
+  handleSearchbarSubmit = value => {
+    this.setState({ value, page: 1, images: [] });
   };
 
-  handleClick = async () => {
-    const { searchQuery, page } = this.state;
-    const searchUrl = `${BASE_URL}q=${searchQuery}&page=${
-      page + 1
-    }&key=${API_KEY}&${searchParams}`;
-    try {
-      this.setState({ isLoading: true });
-      const response = await axios.get(searchUrl);
-      scroll.scrollMore(500);
-      if (response.data.hits.length === 0) {
-        Notiflix.Notify.info('The images of your request is over');
-        return;
-      }
-      this.setState(prevState => ({
-        images: [...prevState.images, ...response.data.hits],
-        page: prevState.page + 1,
-      }));
-    } catch (error) {
-      Notiflix.Notify.failure('Something went wrong, try again.');
-    } finally {
-      this.setState({ isLoading: false });
-    }
+  setModalData = modalData => {
+    this.setState({ modalData, isModalOpen: true });
+  };
+
+  changePage = () => {
+    this.setState(prev => ({ page: prev.page + 1 }));
+  };
+
+  handleModalClose = () => {
+    this.setState({ isModalOpen: false });
   };
 
   render() {
-    const { isLoading, images } = this.state;
+    const { images, isLoading, modalData, isModalOpen } = this.state;
     return (
       <>
-        <Searchbar onSubmit={this.handleSubmit} />
-        {isLoading && <Loader />}
-        <ImageGallery images={images} />
-        {images.length !== 0 && <Button handleClick={this.handleClick} />}
+        <Searchbar onFormSubmit={this.handleSearchbarSubmit} />
+        <AppWrapper>
+          <ImageGallery images={images} onImageClick={this.setModalData} />
+        </AppWrapper>
+        {isLoading ? (
+          <Loader />
+        ) : (
+          images.length > 0 && <Button onClick={this.changePage} />
+        )}
+        {isModalOpen && (
+          <Modal modalData={modalData} onModalClose={this.handleModalClose} />
+        )}
       </>
     );
   }
 }
+
+export default App;
