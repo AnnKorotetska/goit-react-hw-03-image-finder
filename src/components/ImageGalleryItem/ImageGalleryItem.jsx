@@ -4,8 +4,7 @@ import { GalleryImage } from './ImageGalleryItemStyled';
 function ImageGalleryItem({ webformatURL, tags, largeImageURL, onImageClick }) {
   return (
     <li
-      onClick={e => {
-        e.preventDefault();
+      onClick={() => {
         onImageClick({ largeImageURL, tags });
       }}
     >
@@ -18,6 +17,7 @@ ImageGalleryItem.propTypes = {
   webformatURL: PropTypes.string.isRequired,
   tags: PropTypes.string.isRequired,
   largeImageURL: PropTypes.string.isRequired,
+  onImageClick: PropTypes.func.isRequired,
 };
 
 export default ImageGalleryItem;

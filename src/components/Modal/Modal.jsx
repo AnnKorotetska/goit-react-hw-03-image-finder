@@ -11,11 +11,10 @@ class Modal extends Component {
       largeImageURL: PropTypes.string.isRequired,
       tags: PropTypes.string.isRequired,
     }),
-    onModalClose: PropTypes.func,
+    onModalClose: PropTypes.func.isRequired,
   };
 
   handleCloseModal = e => {
-    e.preventDefault();
     if (e.target === e.currentTarget || e.code === 'Escape') {
       this.props.onModalClose();
     }

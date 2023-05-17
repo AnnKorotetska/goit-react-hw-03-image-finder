@@ -11,6 +11,7 @@ export class App extends Component {
   state = {
     images: [],
     value: '',
+    total: 0,
     page: 1,
     isLoading: false,
     isModalOpen: false,
@@ -18,13 +19,16 @@ export class App extends Component {
   };
 
   componentDidUpdate(_, prevState) {
-    const { value, page, images } = this.state;
+    const { value, page } = this.state;
 
     if (page !== prevState.page || value !== prevState.value) {
       this.setState({ isLoading: true });
       Api(value, page)
         .then(({ data }) =>
-          this.setState({ images: [...images, ...data.hits] })
+          this.setState(prevState => ({
+            images: [...prevState.images, ...data.hits],
+            total: data.totalHits,
+          }))
         )
         .catch(err => alert(err.message))
         .finally(() => this.setState({ isLoading: false }));
@@ -44,21 +48,23 @@ export class App extends Component {
   };
 
   handleModalClose = () => {
-    this.setState({ isModalOpen: false });
+    this.setState({ isModalOpen: false, modalData: null });
   };
 
   render() {
-    const { images, isLoading, modalData, isModalOpen } = this.state;
+    const { images, isLoading, modalData, isModalOpen, total } = this.state;
+    const totalPage = total / images.length;
     return (
       <>
         <Searchbar onFormSubmit={this.handleSearchbarSubmit} />
         <AppWrapper>
-          <ImageGallery images={images} onImageClick={this.setModalData} />
+          {images.length > 0 && (
+            <ImageGallery images={images} onImageClick={this.setModalData} />
+          )}
         </AppWrapper>
-        {isLoading ? (
-          <Loader />
-        ) : (
-          images.length > 0 && <Button onClick={this.changePage} />
+        {isLoading && <Loader />}
+        {totalPage > 1 && !isLoading && images.length > 0 && (
+          <Button onClick={this.changePage} />
         )}
         {isModalOpen && (
           <Modal modalData={modalData} onModalClose={this.handleModalClose} />
